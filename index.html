@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What kind of tech innovator are you?</title>
+<style>
+@font-face{font-family:'SCBXR';src:url('assets/fonts/SCBXBeta2-Regular.otf') format('opentype');font-weight:400;}
+@font-face{font-family:'SCBXB';src:url('assets/fonts/SCBXBeta2-Bold.otf') format('opentype');font-weight:700;}
+
+:root{
+  --ink:#1A1A2E; --ink-soft:#4A4A6A; --muted:#9B9BB0; --line:#E8E8F0;
+  --surface:#FFFFFF; --surface-2:#FAFAFC;
+  --accent:#6B4FC9; --accent-dark:#3C3489; --accent-light:#EDE8FB; --on-accent:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#000;}
+body{display:flex;align-items:center;justify-content:center;font-family:'SCBXR',sans-serif;min-height:100vh;}
+
+.frame{position:relative;width:100%;max-width:430px;margin:0 auto;}
+.frame-inner{position:relative;width:100%;padding-top:177.78%;overflow:hidden;background:var(--surface);}
+.screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;overflow-y:auto;}
+
+/* ---------- Shared logo/R&D topbar ---------- */
+.topbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:flex-end;gap:8px;padding:18px 20px;z-index:3;}
+.topbar img.logo{height:16px;width:auto;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
+.rd{font-family:'SCBXB';font-size:10px;line-height:1;letter-spacing:.13em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);border-left:1px solid rgba(255,255,255,.45);padding-left:8px;padding-bottom:1px;}
+.cardcaption{font-family:'SCBXR';font-size:8px;color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.8);margin-top:3px;}
+
+/* ---------- COVER ---------- */
+.cover{
+  background-image:url('assets/cover-bg.jpg');
+  background-size:cover;background-position:center 15%;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.cover-scrim{position:absolute;left:0;right:0;bottom:0;height:52%;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(5,3,10,.6) 28%, rgba(5,3,10,.96) 62%, rgba(3,2,8,1) 100%);}
+.langtoggle{font-family:'SCBXB';font-size:10px;letter-spacing:.05em;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 13px;cursor:pointer;margin-left:auto;}
+.cover-content{position:relative;z-index:2;padding:0 26px 34px;}
+.cover-title{font-family:'SCBXB';font-size:25px;line-height:1.28;color:#fff;margin-bottom:12px;}
+.cover-title .accent{color:#C6B4EF;}
+.cover-desc{font-family:'SCBXR';font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.7);margin-bottom:20px;max-width:340px;}
+.cover-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#8F7AE0,#6B4FC9);color:#fff;font-family:'SCBXB';font-size:15px;padding:16px;border-radius:14px;border:none;box-shadow:0 8px 24px rgba(107,79,201,.45);cursor:pointer;}
+.cover-cta svg{width:16px;height:16px;}
+
+/* ---------- APP CHROME (all non-cover screens) ---------- */
+.app{padding:20px 22px 22px;background:var(--surface);}
+.chrome{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;height:26px;position:relative;z-index:2;}
+.dots{display:flex;gap:5px;}
+.dot{height:5px;border-radius:3px;background:var(--line);transition:width .2s;}
+.dot.active{background:var(--ink);}
+.navbtn{width:auto;background:none;border:none;font-size:18px;color:var(--ink-soft);cursor:pointer;padding:4px 6px;}
+
+button.opt{display:block;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px;font-family:'SCBXR';font-size:13.5px;color:var(--ink);cursor:pointer;line-height:1.4;}
+button.opt:hover{border-color:var(--accent);}
+button.opt.selected{border-color:var(--accent);background:var(--accent-light);font-family:'SCBXB';}
+.other-wrap{border:1.5px solid var(--accent);background:var(--accent-light);border-radius:12px;padding:13px 14px;margin-bottom:9px;}
+.other-label{display:flex;align-items:center;gap:8px;font-family:'SCBXB';font-size:13.5px;color:var(--ink);margin-bottom:10px;}
+.other-check{width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.other-check svg{width:11px;height:11px;}
+.other-input{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:10px 12px;font-family:'SCBXR';font-size:13px;color:var(--ink);}
+.other-count{text-align:right;font-size:10px;color:var(--muted);margin-top:5px;}
+button.primary{width:100%;background:var(--accent);color:var(--on-accent);border:none;border-radius:12px;padding:15px;font-family:'SCBXB';font-size:14px;cursor:pointer;}
+button.primary.disabled{opacity:.35;pointer-events:none;}
+button.secondary{width:100%;background:none;border:none;color:var(--ink-soft);font-family:'SCBXR';font-size:13px;padding:10px;cursor:pointer;}
+.btnrow{display:flex;gap:9px;margin-bottom:9px;}
+button.ghost{flex:1;background:var(--surface);border:1.5px solid var(--line);color:var(--ink);border-radius:12px;padding:13px;font-family:'SCBXB';font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+button.ghost svg{width:15px;height:15px;}
+
+.qlabel{font-family:'SCBXR';font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;}
+.qtext{font-family:'SCBXB';font-size:16.5px;line-height:1.5;color:var(--ink);margin-bottom:18px;}
+.infotext{font-family:'SCBXR';font-size:17px;line-height:1.6;color:#fff;text-align:center;padding:20px 0 26px;text-shadow:0 2px 10px rgba(0,0,0,.5);position:relative;z-index:2;}
+
+/* full-image transition screens */
+.transition-screen{background-image:url('assets/corridor-bg.jpg');background-size:cover;background-position:center;text-align:center;padding:0 28px;}
+.transition-dim{position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;}
+.transition-mid{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center;width:100%;}
+.eyewrap{width:56px;height:56px;margin-bottom:18px;display:flex;align-items:center;justify-content:center;}
+.breathcircle{width:40px;height:40px;border-radius:50%;border:2.5px solid rgba(255,255,255,.85);animation:breathe 3.2s ease-in-out infinite;}
+@keyframes breathe{0%{transform:scale(.7);opacity:.6;}50%{transform:scale(1);opacity:1;}100%{transform:scale(.7);opacity:.6;}}
+.transition-btn{position:relative;z-index:2;background:linear-gradient(135deg,#8F7AE0,#6B4FC9);color:#fff;font-family:'SCBXB';font-size:14px;padding:14px 36px;border-radius:12px;border:none;box-shadow:0 8px 24px rgba(107,79,201,.5);cursor:pointer;margin-top:22px;}
+
+/* ---------- Photo-based result card ---------- */
+.rcard-zoomwrap{zoom:0.76;}
+.rcard{position:relative;width:100%;border-radius:18px;overflow:hidden;background:#0b0b0e;box-shadow:0 10px 28px rgba(0,0,0,.35);margin-bottom:14px;}
+.rcharwrap{position:relative;height:400px;overflow:hidden;background-repeat:no-repeat,no-repeat,no-repeat;background-size:cover,cover,cover;background-position:top center,top center,center;}
+.rbadge{position:absolute;top:40px;right:14px;background:rgba(255,255,255,.94);border-radius:16px;padding:4px 11px;font-family:'SCBXB';font-size:10px;z-index:3;}
+.rpanel{position:relative;padding:11px 14px 13px;}
+.rname{font-family:'SCBXB';font-size:16.5px;color:#fff;text-align:center;margin-bottom:1px;}
+.rtag{font-family:'SCBXR';font-size:10.5px;text-align:center;margin-bottom:7px;}
+.rbody{font-family:'SCBXR';font-size:10px;line-height:1.4;color:rgba(255,255,255,.82);margin-bottom:7px;}
+.rquote{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:7px 9px;font-size:9.5px;font-style:italic;color:#fff;margin-bottom:9px;line-height:1.32;}
+.rbars{margin-bottom:9px;}
+.rbar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.rbar-label{font-size:9px;width:70px;text-align:right;flex-shrink:0;}
+.rbar-track{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.13);overflow:hidden;}
+.rbar-fill{height:100%;border-radius:3px;}
+.rbar-pct{font-size:9px;width:22px;flex-shrink:0;}
+.rmeta{display:flex;gap:7px;margin-bottom:8px;}
+.rmeta-box{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:6px 9px;}
+.rmeta-box p{font-size:8px;letter-spacing:.05em;color:rgba(255,255,255,.5);margin-bottom:1px;}
+.rmeta-box b{font-family:'SCBXB';font-size:10.5px;color:#fff;}
+.rrarity{text-align:center;border-radius:9px;padding:7px;color:#fff;font-family:'SCBXB';font-size:10.5px;}
+.adline{text-align:center;font-size:10.5px;color:var(--ink-soft);margin-bottom:10px;line-height:1.4;}
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="frame-inner" id="stage"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+/* ============ GOOGLE SHEET CONNECTION ============ */
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDyIbETW5A_YKhnOps6VG5rZW6YhmudmjKudL4_j6TBFAt0E42OyOKeWq-tdVH_7ND/exec";
+var LINE_URL = "https://lin.ee/PJiPT5L";
+
+function sendData(payload){
+  if(SCRIPT_URL.indexOf("PASTE_YOUR") > -1){
+    console.log("[Google Sheet not connected yet] Would have sent:", payload);
+    return;
+  }
+  fetch(SCRIPT_URL, {
+    method:"POST", mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  }).catch(function(err){ console.log("Send failed", err); });
+}
+function makeResponseId(){
+  return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,8);
+}
+
+/* ============ SAVE / SHARE CARD IMAGE ============ */
+/* The card displays shrunk in-app (zoom on .rcard-zoomwrap) so everything fits the
+   screen without scrolling. For export, we temporarily remove that zoom so
+   html2canvas always captures the card at its full native size — IG Story-ready —
+   regardless of how small it currently appears on screen. */
+function renderCardToCanvas(callback){
+  var wrap = document.querySelector(".rcard-zoomwrap");
+  var node = document.getElementById("shareCard");
+  var prevZoom = wrap.style.zoom;
+  wrap.style.zoom = "1";
+  html2canvas(node, {backgroundColor:null, scale:3.2}).then(function(cardCanvas){
+    wrap.style.zoom = prevZoom || "";
+
+    /* Compose onto a fixed 1080x1920 canvas (Instagram Story size) so the
+       exported image always fits the story frame exactly, regardless of the
+       card's own natural aspect ratio. The card is scaled to fit the full
+       height with no cropping; any leftover width is filled with the
+       character's own panel color so it reads as an intentional edge, not
+       empty padding. */
+    var IG_W = 1080, IG_H = 1920;
+    var out = document.createElement('canvas');
+    out.width = IG_W; out.height = IG_H;
+    var ctx = out.getContext('2d');
+    var fillColor = (S.res && A[S.res.style]) ? A[S.res.style].dk : "#111111";
+    ctx.fillStyle = fillColor;
+    ctx.fillRect(0, 0, IG_W, IG_H);
+
+    var scale = IG_H / cardCanvas.height;
+    var drawW = cardCanvas.width * scale;
+    var offsetX = (IG_W - drawW) / 2;
+    ctx.drawImage(cardCanvas, offsetX, 0, drawW, IG_H);
+
+    callback(out);
+  }).catch(function(err){
+    wrap.style.zoom = prevZoom || "";
+    console.log("Card render failed", err);
+  });
+}
+function saveCardImage(){
+  renderCardToCanvas(function(canvas){
+    canvas.toBlob(function(blob){
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = "tech-innovator-card.png";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  });
+}
+function shareCardImage(){
+  renderCardToCanvas(function(canvas){
+    canvas.toBlob(function(blob){
+      var file = new File([blob], "tech-innovator-card.png", {type:"image/png"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title:"What kind of tech innovator are you?",
+          text:"I'm " + D[S.res.key].t[0] + " — what's your type?"}).catch(function(){});
+      }else{
+        saveCardImage();
+      }
+    });
+  });
+}
+
+/* ============ ASSETS ============ */
+var LOGO = "assets/logo.webp";
+var CHAR_IMG = {
+  1:"assets/characters/tink_inst.webp", 2:"assets/characters/tink_evid.webp", 3:"assets/characters/tink_peop.jpg",
+  4:"assets/characters/stress_inst.jpg", 5:"assets/characters/stress_evid.jpg", 6:"assets/characters/stress_peop.webp",
+  7:"assets/characters/carto_inst.webp", 8:"assets/characters/carto_evid.jpg", 9:"assets/characters/carto_peop.jpg",
+  10:"assets/characters/trans_inst.jpg", 11:"assets/characters/trans_evid.jpg", 12:"assets/characters/trans_peop.jpg"
+};
+var KEY_TO_IMG = {
+  tink_inst:1, tink_evid:2, tink_peop:3,
+  stress_inst:4, stress_evid:5, stress_peop:6,
+  carto_inst:7, carto_evid:8, carto_peop:9,
+  trans_inst:10, trans_evid:11, trans_peop:12
+};
+
+var A = {
+tink:{c:"#639922",bg:"#EAF3DE",bd:"#97C459",dk:"#173404",lt:"#C6DFA1",n:["Tinkerer","นักลองของ"]},
+stress:{c:"#BA7517",bg:"#FAEEDA",bd:"#EF9F27",dk:"#412402",lt:"#F6D9A4",n:["Stress-tester","นักท้าทาย"]},
+carto:{c:"#7F77DD",bg:"#EEEDFE",bd:"#AFA9EC",dk:"#26215C",lt:"#CFCBF5",n:["Cartographer","นักเขียนแผนที่"]},
+trans:{c:"#D4537E",bg:"#FBEAF0",bd:"#ED93B1",dk:"#4B1528",lt:"#F5C4D6",n:["Translator","นักแปลความ"]}
+};
+var C = {inst:{n:["Instinct","สัญชาตญาณ"]},evid:{n:["Evidence","หลักฐาน"]},peop:{n:["People","ผู้คน"]}};
+var AO = ["tink","stress","carto","trans"];
+
+/* ============ 12 CHARACTER RESULTS ============ */
+var D = {
+carto_inst:{t:["The Pattern Seer","นักปะติดปะต่อ"],g:["Three headlines, one story.","สามข่าว เรื่องเดียวกัน"],
+e:"You see the shape of a thing well before the data confirms it. Three unrelated headlines land in the same week and you already know they are the same story wearing different clothes.",
+th:"คุณเห็นรูปร่างของเรื่องก่อนที่ข้อมูลจะยืนยันด้วยซ้ำ พอมีข่าวสามชิ้นที่ดูไม่เกี่ยวกันโผล่มาในสัปดาห์เดียว คุณรู้ทันทีว่าจริง ๆ แล้วมันคือเรื่องเดียวกัน แค่เปลี่ยนหน้าตา",
+k:["You have said 'I told you this two years ago' and meant it.","คุณเคยพูดว่า \u201cบอกแล้วตั้งแต่สองปีก่อน\u201d แบบพูดจริงด้วยนะ"],o:"The Experimenter",p:"The Storyteller",r:23,
+s:{tink:16,stress:20,carto:44,trans:20}},
+carto_evid:{t:["The Systems Architect","นักวางระบบ"],g:["Show me the structure holding it up.","ขอดูโครงที่รองรับมันก่อน"],
+e:"You do not trust a conclusion until you can see what is holding it up. You map dependencies, name the assumptions out loud, and notice the load-bearing detail everyone else walked past.",
+th:"คุณไม่เชื่อข้อสรุปไหน จนกว่าจะเห็นว่าอะไรค้ำมันอยู่ คุณไล่ดูความเชื่อมโยง พูดสมมติฐานออกมาให้ชัด และมักสังเกตเห็นจุดสำคัญที่คนอื่นเดินผ่านไปโดยไม่ทันสังเกต",
+k:["You have redrawn someone else's diagram because the arrows pointed the wrong way.","คุณเคยวาดไดอะแกรมของคนอื่นใหม่ทั้งหมด เพราะลูกศรมันชี้ผิดทาง"],o:"The Skeptic",p:"The Prototyper",r:17,
+s:{tink:11,stress:27,carto:47,trans:15}},
+carto_peop:{t:["The Connector","นักเชื่อมโยง"],g:["You know who should be talking to whom.","คุณรู้ว่าใครควรได้คุยกับใคร"],
+e:"You carry a map of the organisation in your head, and it is more accurate than the org chart. Most of your best work happens after you leave the conversation.",
+th:"ในหัวคุณมีแผนผังขององค์กรที่แม่นยำกว่าผังจริงเสียอีก พองานใหม่โผล่มา สิ่งแรกที่คุณคิดคือสองคนไหนควรได้ยินเรื่องนี้พร้อมกัน งานที่ดีที่สุดของคุณมักเกิดขึ้นหลังจากที่คุณเดินออกจากวงสนทนาไปแล้ว",
+k:["You have introduced two people who then built something without you.","คุณเคยแนะนำให้สองคนรู้จักกัน แล้วเขาก็ไปสร้างอะไรบางอย่างโดยไม่มีคุณอยู่ด้วย"],o:"The Skeptic",p:"The Amplifier",r:29,
+s:{tink:16,stress:15,carto:42,trans:27}},
+stress_inst:{t:["The Skeptic","นักสงสัย"],g:["Something is off. Give me a minute.","มันมีอะไรแปลก ๆ ขอเวลาคิดแป๊บ"],
+e:"Something feels wrong long before you can explain why, and you have learned to trust that feeling even when you cannot defend it yet.",
+th:"คุณรู้สึกว่ามีอะไรไม่ชอบมาพากล ก่อนจะอธิบายได้ด้วยซ้ำว่าทำไม และคุณเรียนรู้ที่จะเชื่อสัญชาตญาณนั้น แม้จะยังปกป้องมันด้วยเหตุผลไม่ได้",
+k:["You have muttered 'that will not survive contact with reality' during a launch meeting.","คุณเคยพึมพำในที่ประชุมเปิดตัวว่า \u201cของจริงไปไม่รอดหรอก\u201d"],o:"The Connector",p:"The Auditor",r:21,
+s:{tink:19,stress:45,carto:21,trans:15}},
+stress_evid:{t:["The Auditor","นักพิสูจน์"],g:["The number, the source, then the opinion.","ตัวเลข ที่มา แล้วค่อยความเห็น"],
+e:"You ask for the number before you ask for the interpretation, and you have caught enough errors to know the habit is worth the friction it causes.",
+th:"คุณขอดูตัวเลขก่อนจะฟังการตีความเสมอ เพราะเจอข้อผิดพลาดมาเยอะพอจะรู้ว่าความละเอียดแบบนี้คุ้มกับความรำคาญที่มันสร้าง",
+k:["You have opened the footnotes before reading the summary.","คุณเคยเปิดอ่านเชิงอรรถ ก่อนจะอ่านบทสรุปด้วยซ้ำ"],o:"The Storyteller",p:"The Systems Architect",r:24,
+s:{tink:11,stress:48,carto:26,trans:15}},
+stress_peop:{t:["The Devil's Advocate","นักโต้แย้ง"],g:["I disagree, and I am on your side.","ไม่เห็นด้วยหรอก แต่อยู่ข้างคุณนะ"],
+e:"You argue against positions you privately hold, because a decision nobody challenged is a decision nobody tested.",
+th:"คุณชอบเถียงในมุมที่ตัวเองไม่ได้เชื่อจริง ๆ เพราะการตัดสินใจที่ไม่มีใครท้วงเลย คือการตัดสินใจที่ไม่เคยถูกทดสอบ",
+k:["You have taken the losing side of a debate on purpose.","คุณเคยยืนอยู่ฝั่งที่กำลังจะแพ้ในวงถกเถียง แบบตั้งใจเลือกเอง"],o:"The Co-builder",p:"The Pattern Seer",r:34,
+s:{tink:14,stress:42,carto:20,trans:24}},
+trans_inst:{t:["The Storyteller","นักเล่าเรื่อง"],g:["Make them feel it, then explain it.","ให้เขารู้สึกก่อน แล้วค่อยอธิบาย"],
+e:"You reach for the metaphor before the mechanism, because nobody acts on something they cannot picture.",
+th:"คุณนึกถึงคำเปรียบเทียบมาก่อนจะนึกถึงกลไกจริง ๆ เสมอ เพราะรู้ว่าไม่มีใครลงมือทำอะไร ถ้านึกภาพมันไม่ออก",
+k:["You have explained something with an analogy you invented on the spot.","คุณเคยอธิบายเรื่องยากด้วยคำเปรียบเทียบที่คิดขึ้นสด ๆ ตรงนั้น"],o:"The Auditor",p:"The Pattern Seer",r:22,
+s:{tink:15,stress:8,carto:16,trans:61}},
+trans_evid:{t:["The Demystifier","นักถอดรหัส"],g:["Take it apart. Keep the part that matters.","รื้อมันออก เก็บส่วนที่สำคัญไว้"],
+e:"You take something intimidating apart and hand back only the part that actually matters, with nothing important lost on the way.",
+th:"คุณรื้อเรื่องที่ดูซับซ้อนน่ากลัวออกเป็นชิ้น ๆ แล้วส่งคืนแค่ส่วนที่สำคัญจริง โดยไม่ทำอะไรสำคัญหายไประหว่างทาง",
+k:["You have rewritten a colleague's slide because nobody would have understood it.","คุณเคยเขียนสไลด์ของเพื่อนร่วมงานใหม่ทั้งหมด เพราะรู้ว่าไม่มีใครเข้าใจของเดิมแน่ ๆ"],o:"The Prototyper",p:"The Systems Architect",r:18,
+s:{tink:8,stress:16,carto:23,trans:53}},
+trans_peop:{t:["The Amplifier","นักกระจายข่าว"],g:["Understanding it is only half the job.","เข้าใจแล้วยังไม่จบ งานจริงคือส่งต่อให้ถึง"],
+e:"Understanding something is only half the job for you; the other half is making sure it reaches the person who needed it.",
+th:"การเข้าใจเรื่องหนึ่งคือแค่ครึ่งเดียวของงานสำหรับคุณ อีกครึ่งคือทำให้มันไปถึงคนที่ต้องการมันจริง ๆ",
+k:["You have forwarded the same article to four different chats.","คุณเคยส่งบทความเดียวกันไปสี่แชทรวด"],o:"The Experimenter",p:"The Connector",r:27,
+s:{tink:18,stress:7,carto:14,trans:61}},
+tink_inst:{t:["The Prototyper","นักสร้างต้นแบบ"],g:["Build it, then find out.","สร้างก่อน แล้วค่อยรู้"],
+e:"You build first and find out afterwards, because an argument about whether something will work bores you within about four minutes.",
+th:"คุณลงมือสร้างก่อนเสมอ เพราะการนั่งเถียงกันว่าไอเดียนี้จะเวิร์กไหม ทำให้คุณเบื่อภายในไม่กี่นาที ของที่คุณทำครึ่งหนึ่งอาจถูกทิ้งไป แต่คุณมองว่ามันคือราคาที่คุ้มค่า",
+k:["You have built a working version before the requirements document was finished.","คุณเคยสร้างของที่ใช้งานได้เสร็จ ก่อนเอกสารสเปกจะเขียนจบด้วยซ้ำ"],o:"The Demystifier",p:"The Auditor",r:20,
+s:{tink:45,stress:20,carto:15,trans:20}},
+tink_evid:{t:["The Experimenter","นักทดลอง"],g:["Do not argue. Test it.","ไม่ต้องเถียง ทดสอบเลย"],
+e:"You do not argue about what might work; you design the smallest test that will settle it and let the result do the talking.",
+th:"คุณไม่เสียเวลาเถียงว่าอะไรน่าจะเวิร์ก แต่จะออกแบบการทดลองเล็ก ๆ ที่ตอบคำถามได้ตรงจุด แล้วปล่อยให้ผลลัพธ์พูดแทน",
+k:["You have run a test to settle an argument nobody asked you to settle.","คุณเคยทำการทดลองเพื่อยุติข้อถกเถียงที่จริง ๆ ไม่มีใครขอให้คุณยุ่งด้วยซ้ำ"],o:"The Pattern Seer",p:"The Auditor",r:25,
+s:{tink:39,stress:26,carto:22,trans:13}},
+tink_peop:{t:["The Co-builder","นักรวมพลัง"],g:["Best ideas arrive with other hands in the work.","ไอเดียดี ๆ มักเกิดตอนมีคนอื่นร่วมลงมือด้วย"],
+e:"You do your best thinking with other hands in the work, which is why a whiteboard with three people at it beats a perfect brief every time.",
+th:"คุณคิดงานได้ดีที่สุดเมื่อมีคนอื่นอยู่ในห้องด้วยกัน ไวท์บอร์ดที่มีสามคนช่วยกันคิด มักได้ผลลัพธ์ดีกว่าบรีฟที่เขียนมาอย่างสมบูรณ์แบบคนเดียวเสมอ",
+k:["You have booked a workshop instead of writing a document.","คุณเคยจองห้องเวิร์กช็อป ทั้งที่แค่เขียนเอกสารส่งไปก็จบได้"],o:"The Skeptic",p:"The Connector",r:33,
+s:{tink:40,stress:9,carto:15,trans:36}}
+};
+
+/* ============ FLOW ============ */
+var FLOW = [
+{key:"field",hasOther:1,sub:["Before we begin, let's get to know you more...","ก่อนเริ่ม ขออนุญาตสอบถามข้อมูลเบื้องต้นสักเล็กน้อย"],
+q:["Which best describes your organization?","คุณอยู่ในสายงานไหน"],
+o:[["Bank or financial institution","ธนาคารหรือสถาบันการเงิน",{AC:1,RAT:1}],["Government agency or regulator","หน่วยงานรัฐหรือผู้กำกับดูแล",{AC:1,RO:1}],["Technology company or startup","บริษัทเทคโนโลยีหรือสตาร์ทอัพ",{CE:1,AE:1}],["Corporate organization","องค์กรทั่วไป",{SOC:1}],["Student or academic","นักศึกษาหรือสายวิชาการ",{RO:1,RAT:1}],["Other","อื่น ๆ",{}]]},
+{key:"role",hasOther:1,q:["What's your role?","ตำแหน่งงานของคุณคือ"],
+o:[["Strategy or planning (e.g. business strategy, product planning, management)","การวางกลยุทธ์และวางแผน (เช่น กลยุทธ์องค์กร การวางแผนผลิตภัณฑ์ การบริหารจัดการ)",{AC:2,RO:1}],
+["Building or execution (e.g. engineering, operations, implementation)","การพัฒนาและดำเนินการ (เช่น งานวิศวกรรม การปฏิบัติการ การนำแผนงานไปสู่การปฏิบัติจริง)",{CE:2,AE:2}],
+["Communication or storytelling (e.g. marketing, PR, content, design)","การสื่อสารและการนำเสนอ (เช่น การตลาด ประชาสัมพันธ์ การผลิตคอนเทนต์ งานออกแบบ)",{CE:1,RO:1,SOC:1}],
+["Analysis or data (e.g. data science, research, finance, risk)","การวิเคราะห์และข้อมูล (เช่น Data Science งานวิจัย การเงิน การบริหารความเสี่ยง)",{AC:2,AE:1}],
+["Other","อื่น ๆ",{}]]},
+{key:"tenure",q:["How many years of work experience do you have?","คุณมีประสบการณ์ทำงานกี่ปี"],
+o:[["Less than a year / Unemployed / Student","น้อยกว่า 1 ปี / ว่างงาน / นักศึกษา",{AE:1,EXP:1}],["1-5 years","1-5 ปี",{}],["6-15 years","6-15 ปี",{SOC:1,RO:1}],["More than 15 years","มากกว่า 15 ปี",{RAT:1,RO:1}]]},
+{info:1,ti:["Okay — ready?","พร้อมนะ"],btn:["Continue","ต่อไป"]},
+{info:1,eyeflash:1,ti:["Take a breath.<br>A few scenes are about to unfold.","หายใจเข้าลึก ๆ<br>เรื่องราวกำลังจะเริ่มขึ้น"],btn:["Begin","เริ่มเลย"]},
+{key:"scene1",scene:1,q:["A new technology lands on the agenda. Nobody in the room understands it. Three days later, you're the only one with an actual opinion about it. Why?","เทคโนโลยีตัวใหม่ถูกเอาเข้าที่ประชุม ไม่มีใครในห้องเข้าใจมันเลย สามวันต่อมา คุณกลายเป็นคนเดียวที่มีความเห็นจริงจังต่อเรื่องนี้ เพราะอะไร"],
+o:[["I got my hands on it and just started using it","คุณไปเสาะหามาลองเล่นเองเลย",{CE:3,AE:3}],["I spent those days mapping out where it fits","คุณใช้สามวันนั้นหาว่ามันอยู่ตรงไหนของภาพใหญ่ของทีม",{AC:3,RO:3}],["I spent those days trying to break it","คุณใช้สามวันนั้นลองหาว่าจะพังมันตรงไหนได้บ้าง",{AC:3,AE:2}],["I spent those days figuring out how to explain it to everyone","คุณมัวแต่หาวิธีอธิบายให้คนอื่นเข้าใจ",{CE:2,RO:3}]]},
+{key:"scene2",scene:1,q:["You were dead certain about something once. Then one day, you weren't. What actually flipped it?","ครั้งหนึ่งคุณมั่นใจสุด ๆ ในเรื่องหนึ่ง แล้ววันหนึ่งความมั่นใจนั้นก็หายไป อะไรที่ทำให้มันพลิก"],
+o:[["The numbers stopped supporting it","ตัวเลขไม่สนับสนุนอีกต่อไป",{RAT:3}],["Someone I trust saw it differently","คนที่คุณเชื่อใจที่สุดกลับมองไม่เหมือนกัน",{SOC:3}],["It simply stopped feeling right","มันเริ่มรู้สึกไม่ใช่",{EXP:3}],["I tried it myself and it did not hold","พอได้ลองเองจริง ๆ กลับไม่เป็นแบบที่คิด",{RAT:1,EXP:1,AE:2}]]},
+{key:"scene3",scene:1,q:["You need to understand something you know nothing about — by Friday. It's now Wednesday night. What are you doing right now?","สมมติคุณต้องเข้าใจเรื่องที่ไม่รู้อะไรเลยให้ทันวันศุกร์นี้ แล้วตอนนี้คือคืนวันพุธแล้ว คุณจะกำลังทำอะไรอยู่"],
+o:[["Already diving in and doing it badly","เริ่มลงมือทำไปเลย ถึงจะยังทำได้ไม่ดีก็ตาม",{AE:3,CE:2}],["Mapping out how all the pieces connect before touching anything","นั่งไล่ดูก่อนว่าแต่ละส่วนมันต่อกันยังไง ค่อยเริ่มลงมือ",{AC:3,RO:3}],["Stress-testing my own understanding","ลองจับผิดความเข้าใจของตัวเองดูก่อน",{AC:3,AE:2}],["Explaining it out loud to someone else to see if it holds together","ลองพูดอธิบายให้คนอื่นฟัง ดูว่าตัวเองเข้าใจจริงไหม",{CE:2,RO:3}]]},
+{key:"scene4",scene:1,q:["Now, imagine you're in a meeting room. It's gone quiet, half the room is looking straight at you. What had you done beforehand?","ลองนึกภาพว่าคุณอยู่ในห้องประชุม ห้องเงียบลง ครึ่งห้องหันมามองคุณ ก่อนหน้านั้นคุณทำอะไรไป"],
+o:[["I pulled up the data and let the numbers do the talking, not my opinion.","หยิบข้อมูลและตัวเลขขึ้นมากางให้ดู ให้หลักฐานเป็นคนพูดแทนคุณ ไม่ใช่ความเห็นส่วนตัว",{RAT:3,AC:1}],["Before today, I'd already talked it through with the two people whose support mattered most.","ก่อนถึงวันนี้ คุณไปคุยและได้รับความเห็นชอบจากสองคนที่สำคัญที่สุดในห้องมาล่วงหน้าแล้ว",{SOC:3}],["I trusted what felt right and said it plainly, without waiting for proof.","คุณเชื่อในสิ่งที่ตัวเองรู้สึกว่าใช่ แล้วพูดออกไปตรง ๆ อย่างมั่นใจ โดยไม่ต้องรอหลักฐานมายืนยัน",{EXP:3,AE:1}],["I reframed the story from a different angle until they started to see it too.","คุณเล่าเรื่องใหม่ในมุมที่ต่างออกไป จนพวกเขาเริ่มเห็นภาพเดียวกับที่คุณเห็น",{SOC:2,CE:1,RO:1}]]},
+{key:"beat_q7",q:["Five notifications arrive at the same moment. Which do you open first?","การแจ้งเตือนห้าข้อความเด้งเข้ามาพร้อมกัน คุณจะเปิดอ่านอันไหนก่อน"],
+o:[["This company used AI to cut processing time by 80%. How?","บริษัทนี้ใช้ AI ลดเวลาทำงานได้ถึง 80% เขาทำได้ยังไง?","opt",{AE:1}],["How does the bank know what you need before you even ask?","ธนาคารทำยังไงถึงรู้ใจลูกค้า ก่อนลูกค้าจะพูดออกมาด้วยซ้ำ","hum",{CE:1}],["Today's deepfakes can fool even the experts","Deepfake ปัจจุบันหลอกได้แม้แต่ผู้เชี่ยวชาญ","sys",{AC:1,RAT:1}],["Real estate you can buy for $50 — welcome to tokenized assets","อสังหาฯ ที่ซื้อได้ในราคาหลักร้อย นี่คือโลกของสินทรัพย์โทเคน","dig",{AE:1,EXP:1}],["Your company's carbon footprint just got an actual price tag","คาร์บอนฟุตพรินต์ของบริษัทคุณ ตอนนี้มีราคาจริงแล้ว","sus",{AC:1,RO:1}]],beat:1},
+{key:"beat_q9",q:["Imagine your organization hands you an unlimited budget — with one condition: you may use it to solve only one problem. Which would you choose?","ลองจินตนาการว่าองค์กรของคุณให้งบไม่จำกัดมา แต่มีเงื่อนไขเดียวคือแก้ปัญหาได้แค่เรื่องเดียว คุณจะเลือกแก้เรื่องอะไร"],
+o:[["Approval and process delays","ความล่าช้าของกระบวนการอนุมัติ","opt",{AE:1}],["The distance between us and our customers","ระยะห่างระหว่างเรากับลูกค้า","hum",{CE:1,SOC:1}],["The gap in trust and security","ช่องว่างด้านความเชื่อมั่นและความปลอดภัย","sys",{AC:1}],["Our slow pace on new assets","ความช้าในการก้าวทันสินทรัพย์ใหม่ ๆ","dig",{AE:1}],["How little we invest in the planet","การลงทุนเพื่อโลกที่ยังน้อยเกินไป","sus",{RO:1}]],beat:2},
+{key:"reading",q:["When a new idea lands in your feed, you...","พอมีไอเดียใหม่ ๆ มาถึงฟีดคุณ คุณจะ..."],
+o:[["Open immediately","เปิดอ่านทันที",{AE:1,EXP:1}],["Read within the week","อ่านภายในสัปดาห์นั้น",{RO:1,RAT:1}],["Scan the headlines, open what matters","กวาดดูหัวข้อ เปิดเฉพาะที่สำคัญ",{AC:1}],["Save for later","เก็บไว้อ่านทีหลัง",{SOC:1,CE:1}]]}
+];
+
+var ACT3 = [
+{key:"format",q:["What kind of media do you prefer to receive frontier news?","อยากรับข่าวสาร Frontier ในรูปแบบสื่อแบบไหน"],o:[["Short article","บทความสั้น"],["Podcast","พอดแคสต์"],["Infographic","อินโฟกราฟิก"],["Video","วิดีโอ"]]},
+{key:"frequency",q:["How often do you want updates?","อยากได้อัปเดตบ่อยแค่ไหน"],o:[["Every update","ทุกครั้งที่มีอัปเดต"],["Weekly digest","สรุปรายสัปดาห์"],["Monthly","รายเดือน"],["Only major stories","เฉพาะเรื่องสำคัญ"]]}
+];
+
+/* ============ STATE ============ */
+var S = {ph:"cover", i:0, a3:0, lang:0, langLocked:false, selected:{}, selectedA3:{}, otherText:{}, res:null, rid:null};
+function T(x){return x[S.lang];}
+
+function computeScores(){
+  var sc={CE:0,AC:0,AE:0,RO:0,EXP:0,RAT:0,SOC:0};
+  for(var idx=0; idx<FLOW.length; idx++){
+    var step=FLOW[idx];
+    if(step.info) continue;
+    var sel=S.selected[idx];
+    if(sel===undefined) continue;
+    var opt=step.o[sel];
+    var w = step.beat ? opt[3] : opt[2];
+    for(var k in w){ sc[k]=(sc[k]||0)+w[k]; }
+  }
+  return sc;
+}
+function calc(){
+  var t=computeScores();
+  var st={tink:t.CE+t.AE,stress:t.AC+t.AE,carto:t.AC+t.RO,trans:t.CE+t.RO};
+  var top="tink";for(var k in st){if(st[k]>st[top]){top=k;}}
+  var conv="inst";var cv={inst:t.EXP,evid:t.RAT,peop:t.SOC};for(var c in cv){if(cv[c]>cv[conv]){conv=c;}}
+  return {style:top,conv:conv,key:top+"_"+conv};
+}
+function findFlow(key){ for(var idx=0; idx<FLOW.length; idx++){ if(FLOW[idx].key===key) return idx; } return -1; }
+function ansText(key){
+  var idx=findFlow(key); if(idx<0) return "";
+  var sel=S.selected[idx]; if(sel===undefined) return "";
+  var step=FLOW[idx];
+  if(step.hasOther && sel===step.o.length-1 && S.otherText[key]){
+    return "Other: " + S.otherText[key];
+  }
+  return step.o[sel][0];
+}
+function beatTheme(key){
+  var idx=findFlow(key); if(idx<0) return "";
+  var sel=S.selected[idx]; if(sel===undefined) return "";
+  return FLOW[idx].o[sel][2];
+}
+function buildCorePayload(){
+  return {
+    sheet:"core", response_id:S.rid,
+    field:ansText("field"), role:ansText("role"), tenure:ansText("tenure"),
+    scene1:ansText("scene1"), scene2:ansText("scene2"), scene3:ansText("scene3"), scene4:ansText("scene4"),
+    beat_q7:beatTheme("beat_q7"), beat_q9:beatTheme("beat_q9"),
+    reading:ansText("reading"),
+    result_style:S.res.style, result_conviction:S.res.conv, result_character:D[S.res.key].t[0],
+    lang:S.lang?"th":"en"
+  };
+}
+function findA3(key){ for(var idx=0; idx<ACT3.length; idx++){ if(ACT3[idx].key===key) return idx; } return -1; }
+function ansTextA3(key){
+  var idx=findA3(key); if(idx<0) return "";
+  var sel=S.selectedA3[idx]; if(sel===undefined) return "";
+  return ACT3[idx].o[sel][0];
+}
+function buildPersonalizePayload(){
+  return { sheet:"personalize", response_id:S.rid, format:ansTextA3("format"), frequency:ansTextA3("frequency") };
+}
+
+/* ============ NAVIGATION ============ */
+function selectOption(i){ S.selected[S.i]=i; render(); }
+function selectOptionA3(i){ S.selectedA3[S.a3]=i; render(); }
+
+function advanceFlow(){
+  if(S.i<FLOW.length-1){ S.i++; }
+  else{
+    S.res=calc();
+    if(!S.rid){S.rid=makeResponseId();}
+    sendData(buildCorePayload());
+    S.ph="result";
+  }
+  render();
+}
+function confirmNext(){ if(S.selected[S.i]===undefined) return; advanceFlow(); }
+function advInfo(){ advanceFlow(); }
+
+function advanceAct3(){
+  if(S.a3<ACT3.length-1){ S.a3++; }
+  else{ sendData(buildPersonalizePayload()); S.ph="done"; }
+  render();
+}
+function confirmNextA3(){ if(S.selectedA3[S.a3]===undefined) return; advanceAct3(); }
+
+function back(){
+  if(S.ph==="flow"){
+    if(S.i>0){S.i--;} else {S.ph="cover"; S.langLocked=false;}
+  }else if(S.ph==="act3"){
+    if(S.a3>0){S.a3--;} else {S.ph="result";}
+  }else if(S.ph==="result"){
+    S.ph="flow"; S.i=FLOW.length-1;
+  }else if(S.ph==="done"){
+    S.ph="result";
+  }
+  render();
+}
+function startQuiz(){ S.ph="flow"; S.langLocked=true; S.rid=makeResponseId(); render(); }
+function toggleLang(){ if(S.langLocked) return; S.lang=S.lang?0:1; render(); }
+function restart(){
+  S={ph:"cover",i:0,a3:0,lang:S.lang,langLocked:false,selected:{},selectedA3:{},otherText:{},res:null,rid:null};
+  render();
+}
+
+function chromeHtml(dotsTotal, dotsCur){
+  var d="";
+  if(dotsTotal){for(var i=0;i<dotsTotal;i++){d+='<div class="dot'+(i===dotsCur?' active':'')+'" style="width:'+(i===dotsCur?"16px":"6px")+';"></div>';}}
+  return '<div class="chrome">'
+    +'<button class="navbtn" onclick="back()">&#8592;</button>'
+    +'<div class="dots">'+d+'</div>'
+    +'<div style="width:30px;"></div>'
+    +'</div>';
+}
+function topbarHtml(){
+  return '<div class="topbar" style="flex-direction:column;align-items:flex-start;gap:5px;">'
+    +'<div style="display:flex;align-items:flex-end;gap:7px;"><img class="logo" src="'+LOGO+'"><div class="rd" style="text-shadow:none;">R&amp;D</div></div>'
+    +'<div class="cardcaption">'+(S.lang?"ติดตามความรู้ใหม่ ๆ ผ่าน LINE @scbxrd":"Stay tech-updated via LINE @scbxrd")+'</div>'
+    +'</div>';
+}
+
+function render(){
+  var stage=document.getElementById("stage"), h="";
+
+  if(S.ph==="cover"){
+    h='<div class="screen cover">'
+      +'<div class="cover-scrim"></div>'
+      +'<div class="topbar">'
+      +'<img class="logo" src="'+LOGO+'"><div class="rd">R&amp;D</div>'
+      +'<button class="langtoggle" onclick="toggleLang()">'+(S.lang?"EN":"TH")+'</button></div>'
+      +'<div class="cover-content">';
+    if(S.lang){
+      h+='<div class="cover-title">คุณเป็นผู้สร้าง<span class="accent">นวัตกรรมทางเทคโนโลยี</span>แบบไหน?</div>'
+        +'<div class="cover-desc">เทคโนโลยีใหม่เข้าสู่วาระการประชุมทุกเดือน บางคนพร้อมลงมือทันที บางคนตั้งคำถามอย่างจริงจัง และบางคนอยากรู้เพียงแค่ R&amp;D เท่านั้น ใช้เวลาเพียง 2 นาที มาดูกันว่าคุณเป็นคนแบบไหน</div>';
+    }else{
+      h+='<div class="cover-title">What kind of <span class="accent">Tech Innovator</span> are you?</div>'
+        +'<div class="cover-desc">New tech lands on the agenda every month. Some people dive in, some push back, some just want the R&amp;D. Take 2 minutes to find out which one you are.</div>';
+    }
+    h+='<button class="cover-cta" onclick="startQuiz()"><span>'+(S.lang?"เริ่มทำแบบทดสอบ":"Start the quiz")+'</span>'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>'
+      +'</div></div>';
+
+  }else if(S.ph==="flow"){
+    var step=FLOW[S.i];
+    if(step.info){
+      var dimOpacity = step.eyeflash ? .93 : .58;
+      h='<div class="screen transition-screen">'
+        +'<div class="transition-dim" style="background:rgba(4,3,8,'+dimOpacity+');"></div>'
+        +chromeHtml(FLOW.length, S.i)
+        +'<div class="transition-mid">';
+      if(step.eyeflash){
+        h+='<div class="eyewrap"><div class="breathcircle"></div></div>';
+      }
+      h+='<div class="infotext">'+T(step.ti)+'</div>'
+        +'<button class="transition-btn" onclick="advInfo()">'+T(step.btn)+'</button>'
+        +'</div></div>';
+    }else{
+      h='<div class="screen app">'+chromeHtml(FLOW.length, S.i);
+      if(step.sub){h+='<div class="qlabel">'+T(step.sub)+'</div>';}
+      h+='<div class="qtext">'+T(step.q)+'</div>';
+      var sel=S.selected[S.i];
+      var otherIdx = step.hasOther ? step.o.length-1 : -1;
+      for(var i=0;i<step.o.length;i++){
+        var opt=step.o[i], isSel=(sel===i);
+        if(i===otherIdx && isSel){
+          var curVal = S.otherText[step.key] || "";
+          h+='<div class="other-wrap">'
+            +'<div class="other-label"><div class="other-check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+T([opt[0],opt[1]])+'</div>'
+            +'<input class="other-input" id="otherInput" maxlength="25" placeholder="'+(S.lang?"พิมพ์คำตอบที่นี่...":"Type your answer here...")+'" value="'+curVal.replace(/"/g,"&quot;")+'" oninput="document.getElementById(\'otherCount\').textContent=this.value.length+\'/25\';S.otherText[\''+step.key+'\']=this.value;">'
+            +'<div class="other-count" id="otherCount">'+curVal.length+'/25</div>'
+            +'</div>';
+        }else{
+          h+='<button class="opt'+(isSel?' selected':'')+'" onclick="selectOption('+i+')">'+T([opt[0],opt[1]])+'</button>';
+        }
+      }
+      h+='<button class="primary'+(sel===undefined?' disabled':'')+'" onclick="confirmNext()" style="margin-top:8px;">'+(S.lang?"ถัดไป":"Next")+' &#8594;</button>';
+      h+='</div>';
+    }
+
+  }else if(S.ph==="result"){
+    var d=D[S.res.key], a=A[S.res.style], imgNum=KEY_TO_IMG[S.res.key];
+    var so=AO.slice().sort(function(x,y){return d.s[y]-d.s[x];});
+    var bars="";
+    for(var j=0;j<so.length;j++){
+      var k=so[j], lead=(k===S.res.style);
+      bars+='<div class="rbar-row"><span class="rbar-label" style="color:'+(lead?'#fff':'rgba(255,255,255,.5)')+';font-family:'+(lead?"'SCBXB'":"'SCBXR'")+';">'+T(A[k].n)+'</span>'
+        +'<div class="rbar-track"><div class="rbar-fill" style="width:'+d.s[k]+'%;background:'+(lead?'linear-gradient(90deg,'+a.bd+','+a.c+')':'rgba(255,255,255,.28)')+';"></div></div>'
+        +'<span class="rbar-pct" style="color:'+(lead?'#fff':'rgba(255,255,255,.5)')+';font-family:'+(lead?"'SCBXB'":"'SCBXR'")+';">'+d.s[k]+'%</span></div>';
+    }
+    h='<div class="screen app">'+chromeHtml(0,0)
+      +'<div class="rcard-zoomwrap"><div class="rcard" id="shareCard">'
+      +topbarHtml()
+      +'<div class="rcharwrap" style="background-image:linear-gradient(180deg,'+a.dk+'00 0%,'+a.dk+'00 57%,'+a.dk+'8C 77%,'+a.dk+'EB 89%,'+a.dk+' 100%),url('+CHAR_IMG[imgNum]+'),linear-gradient(160deg,'+a.bd+','+a.c+');"></div>'
+      +'<div class="rbadge" style="color:'+a.dk+';">'+T(C[S.res.conv].n)+'</div>'
+      +'<div class="rpanel" style="background:'+a.dk+';">'
+      +'<div class="rname">'+T(d.t)+'</div>'
+      +'<div class="rtag" style="color:'+a.lt+';">'+T(d.g)+'</div>'
+      +'<div class="rbody">'+(S.lang?d.th:d.e)+'</div>'
+      +'<div class="rquote">&#8220;'+T(d.k)+'&#8221;</div>'
+      +'<div class="rbars">'+bars+'</div>'
+      +'<div class="rmeta"><div class="rmeta-box"><p>'+(S.lang?"ขั้วตรงข้าม":"OPPOSITE")+'</p><b>'+d.o+'</b></div>'
+      +'<div class="rmeta-box"><p>'+(S.lang?"เข้าขากับ":"PAIRS WITH")+'</p><b>'+d.p+'</b></div></div>'
+      +'<div class="rrarity" style="background:linear-gradient(135deg,'+a.bd+','+a.c+');">'+(S.lang?"มีเพียง 1 ใน "+d.r+" คนที่ได้การ์ดใบนี้":"Only 1 in "+d.r+" people get this card")+'</div>'
+      +'</div></div></div>'
+      +'<div class="btnrow">'
+      +'<button class="ghost" onclick="saveCardImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'+(S.lang?"บันทึกรูป":"Save image")+'</button>'
+      +'<button class="ghost" onclick="shareCardImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>'+(S.lang?"แชร์":"Share")+'</button>'
+      +'</div>'
+      +'<div class="adline"><a href="'+LINE_URL+'" target="_blank" style="color:var(--accent);font-family:\'SCBXB\';text-decoration:underline;">'+(S.lang?"ติดตามความรู้ใหม่ ๆ ได้ง่าย ๆ ผ่าน SCBX R&D LINE":"Stay tech-updated easily via SCBX R&D LINE")+'</a></div>'
+      +'<button class="primary" onclick="S.ph=\'act3\';render();">'+(S.lang?"ช่วยปรับคอนเทนต์ให้เหมาะกับคุณ":"Help us tailor the content for you")+'</button>'
+      +'</div>';
+
+  }else if(S.ph==="act3"){
+    var q=ACT3[S.a3], sel3=S.selectedA3[S.a3];
+    h='<div class="screen app">'+chromeHtml(ACT3.length, S.a3)
+      +'<div class="qtext">'+T(q.q)+'</div>';
+    for(var m=0;m<q.o.length;m++){
+      var isSel3=(sel3===m);
+      h+='<button class="opt'+(isSel3?' selected':'')+'" onclick="selectOptionA3('+m+')">'+T(q.o[m])+'</button>';
+    }
+    h+='<button class="primary'+(sel3===undefined?' disabled':'')+'" onclick="confirmNextA3()" style="margin-top:8px;">'+(S.lang?"ถัดไป":"Next")+' &#8594;</button>';
+    h+='</div>';
+
+  }else if(S.ph==="done"){
+    var d2=D[S.res.key], a2=A[S.res.style], imgNum2=KEY_TO_IMG[S.res.key];
+    h='<div class="screen app" style="align-items:center;justify-content:center;text-align:center;">'
+      +chromeHtml(0,0)
+      +'<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">'
+      +'<div style="width:84px;height:84px;border-radius:50%;overflow:hidden;margin:0 auto;"><img src="'+CHAR_IMG[imgNum2]+'" style="width:100%;height:100%;object-fit:cover;object-position:top center;"></div>'
+      +'<p style="font-family:\'SCBXB\';font-size:16px;margin:12px 0 4px;">'+(S.lang?"ขอบคุณที่ตอบแบบสอบถาม":"Thank you for taking our survey")+'</p>'
+      +'<p style="color:var(--ink-soft);font-size:13px;margin-bottom:20px;">'+(S.lang?"การ์ด "+T(d2.t)+" ของคุณพร้อมแล้ว":"Your "+T(d2.t)+" card is ready.")+'</p>'
+      +'<button class="primary" style="margin-bottom:8px;" onclick="S.ph=\'result\';render();">'+(S.lang?"ดูและแชร์การ์ด":"View and share my card")+'</button>'
+      +'<button class="secondary" style="margin-bottom:14px;" onclick="restart()">'+(S.lang?"เล่นอีกครั้ง":"Take it again")+'</button>'
+      +'<div style="background:#F5F0FA;border:1px solid #E0D4F0;border-radius:12px;padding:16px 12px;text-align:center;width:100%;">'
+      +'<p style="font-size:11.3px;color:var(--ink);line-height:1.5;margin-bottom:12px;">'+(S.lang?"ติดตามความเคลื่อนไหวด้านเทคโนโลยีได้ที่ SCBX R&D บน LINE":"Stay tech-updated by adding SCBX R&D on LINE.")+'</p>'
+      +'<a href="'+LINE_URL+'" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#06C755;color:#fff;font-family:\'SCBXB\';font-size:13px;padding:11px 22px;border-radius:10px;text-decoration:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 5.94 2 10.8c0 4.34 3.55 7.98 8.35 8.67.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .87.55 1.08-.46 5.8-3.42 7.92-5.85C21.4 14.3 22 12.62 22 10.8 22 5.94 17.52 2 12 2z"/></svg>'+(S.lang?"เพิ่มเพื่อน LINE":"Add LINE")+'</a>'
+      +'</div>'
+      +'</div></div>';
+  }
+
+  stage.innerHTML = h;
+}
+render();
+</script>
+</body>
+</html>
